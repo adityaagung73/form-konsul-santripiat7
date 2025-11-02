@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Konsul Santri - Penjemputan & Pengantaran</title>
+    <!-- Muat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Muat Font Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Ikon untuk background (opsional, dari Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ikon background transparan */
+        body::before {
+            content: "\f072"; /* ikon pesawat */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            font-size: 20rem;
+            color: rgba(0, 105, 137, 0.03);
+            z-index: -1;
+            transform: rotate(-20deg);
+        }
+        
+        body::after {
+            content: "\f238"; /* ikon kereta */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: fixed;
+            bottom: 10%;
+            right: 5%;
+            font-size: 25rem;
+            color: rgba(0, 105, 137, 0.04);
+            z-index: -1;
+            transform: rotate(15deg);
+        }
+
+        /* Kustomisasi scrollbar (opsional) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0083aa;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #005670;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border-top-color: transparent;
+            width: 1.5rem;
+            height: 1.5rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Sembunyikan panah di input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Card Form Utama -->
+    <div class="w-full max-w-lg bg-white/80 backdrop-blur-sm p-6 sm:p-8 rounded-2xl shadow-xl transition-all duration-300">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Form Konsul Santri</h1>
+            <p class="text-gray-600 mt-1">Penjemputan & Pengantaran</p>
+        </div>
+        
+        <!-- Form Utama -->
+        <form id="mainForm" class="space-y-5">
+
+            <!-- Jenis Layanan (DIUBAH JADI RADIO BUTTON) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Layanan</label>
+                <div class="flex items-center space-x-6">
+                    <label for="pengantaran" class="flex items-center cursor-pointer">
+                        <input type="radio" id="pengantaran" name="jenis_layanan" value="Pengantaran" checked
+                               class="h-5 w-5 text-cyan-600 border-gray-300 focus:ring-cyan-500">
+                        <span class="ml-2 text-gray-700">Pengantaran</span>
+                    </label>
+                    <label for="penjemputan" class="flex items-center cursor-pointer">
+                        <input type="radio" id="penjemputan" name="jenis_layanan" value="Penjemputan"
+                               class="h-5 w-5 text-cyan-600 border-gray-300 focus:ring-cyan-500">
+                        <span class="ml-2 text-gray-700">Penjemputan</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Nama Santri (Bisa Dicari) -->
+            <div>
+                <label for="nama_santri" class="block text-sm font-medium text-gray-700 mb-1">Nama Santri (Ketik untuk mencari)</label>
+                <input type="text" id="nama_santri" name="nama_santri" list="santri-list" required
+                       placeholder="Ketik nama santri..."
+                       class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200">
+                <datalist id="santri-list">
+                    <!-- Opsi santri akan dimuat di sini oleh JS -->
+                </datalist>
+            </div>
+            
+            <!-- Baris Kelas & No Tlp Walsan (terisi otomatis) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="kelas" class="block text-sm font-medium text-gray-700 mb-1">Kelas / Jenjang</label>
+                    <input type="text" id="kelas" name="kelas" required readonly
+                           placeholder="Otomatis terisi..."
+                           class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200">
+                </div>
+                <div>
+                    <label for="no_tlp_walsan" class="block text-sm font-medium text-gray-700 mb-1">No. Tlp Walsan</label>
+                    <input type="tel" id="no_tlp_walsan" name="no_tlp_walsan" required readonly
+                           placeholder="Otomatis terisi..."
+                           class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200">
+                </div>
+            </div>
+
+            <!-- Baris Tanggal & Jam -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label id="label_tanggal" for="tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Keberangkatan</label>
+                    <input type="date" id="tanggal" name="tanggal" required
+                           class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200">
+                </div>
+                <div>
+                    <label id="label_jam" for="jam" class="block text-sm font-medium text-gray-700 mb-1">Jam Keberangkatan (sesuai tiket)</label>
+                    <input type="time" id="jam" name="jam" required
+                           class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200">
+                </div>
+            </div>
+
+            <!-- Tujuan -->
+            <div>
+                <label id="label_tujuan" for="tujuan" class="block text-sm font-medium text-gray-700 mb-1">Tujuan</label>
+                <select id="tujuan" name="tujuan" required
+                        class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200">
+                    <option value="" disabled selected>Memuat tujuan...</option>
+                    <!-- Opsi tujuan akan dimuat di sini oleh JS -->
+                </select>
+            </div>
+
+            <!-- Upload Tiket -->
+            <div>
+                <label for="tiket" class="block text-sm font-medium text-gray-700 mb-1">Upload Tiket (PDF/JPG/PNG, Max 5MB)</label>
+                <input type="file" id="tiket" name="tiket" required accept=".pdf,.jpg,.jpeg,.png"
+                       class="w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-white shadow-sm
+                              file:mr-4 file:py-3 file:px-4 file:rounded-l-lg file:border-0
+                              file:text-sm file:font-semibold file:bg-cyan-50 file:text-cyan-700
+                              hover:file:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500">
+                <p id="fileError" class="text-red-500 text-sm mt-1" style="display: none;"></p>
+            </div>
+
+            <!-- Keterangan -->
+            <div>
+                <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-1">Keterangan Tambahan (Opsional)</label>
+                <textarea id="keterangan" name="keterangan" rows="3"
+                          placeholder="Misal: Nomor penerbangan, kode booking, atau info penjemput..."
+                          class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition duration-200"></textarea>
+            </div>
+
+            <!-- Tombol Kirim -->
+            <div>
+                <button type="submit" id="submitButton"
+                        class="w-full flex items-center justify-center bg-cyan-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg
+                               hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2
+                               transition duration-300 ease-in-out transform hover:-translate-y-0.5">
+                    <span id="submitText">Kirim Data</span>
+                    <!-- Spinner loading -->
+                    <div id="loadingSpinner" class_normal="spinner border-4 border-white/20 rounded-full" style="display: none;"></div>
+                </button>
+            </div>
+        </form>
+
+        <!-- Link Admin -->
+        <div class="text-center mt-6">
+            <a href="#" id="adminLink" class="text-sm text-gray-500 hover:text-cyan-600 hover:underline">Masuk sebagai Admin</a>
+        </div>
+    </div>
+
+    <!-- Panel Admin (Tersembunyi) -->
+    <div id="adminPanel" class="w-full max-w-lg bg-gray-50 p-8 rounded-2xl shadow-xl transition-all duration-300" style="display: none;">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Panel Admin</h2>
+        
+        <!-- Form Login Admin -->
+        <form id="adminLoginForm" class="space-y-4">
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password Admin</label>
+                <input type="password" id="password" name="password"
+                       class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500">
+            </div>
+            <button type="submit"
+                    class="w-full flex items-center justify-center bg-cyan-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg
+                           hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition duration-300">
+                Login
+            </button>
+            <p id="adminError" class="text-red-500 text-sm" style="display: none;">Password salah.</p>
+        </form>
+
+        <!-- Konten Admin (Setelah Login) -->
+        <div id="adminContent" class="space-y-6" style="display: none;">
+            
+            <!-- Link Buka Spreadsheet -->
+            <div>
+                <a id="spreadsheetLink" href="#" target="_blank"
+                   class="w-full block text-center bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg
+                          hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300">
+                    Buka Spreadsheet Data
+                </a>
+            </div>
+            
+            <!-- Form Tambah Tujuan -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Tambah Tujuan Baru</h3>
+                <form id="addDestinationForm" class="sm:flex sm:space-x-2 space-y-2 sm:space-y-0">
+                    <input type="text" id="newDestination" placeholder="Nama Tujuan (misal: PO Rosalia)" required
+                           class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500">
+                    <input type="url" id="newDestWaLink" placeholder="Link Grup WA (Opsional)"
+                           class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500">
+                    <button type="submit" id="addDestButton"
+                            class="w-full sm:w-auto px-4 py-3 bg-cyan-600 text-white font-semibold rounded-lg shadow-md hover:bg-cyan-700 transition duration-300">
+                        Tambah
+                    </button>
+                </form>
+            </div>
+
+            <!-- Daftar Hapus Tujuan -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Hapus Tujuan</h3>
+                <div id="destinationList" class="space-y-2 max-h-48 overflow-y-auto bg-white p-4 rounded-lg border">
+                    <!-- Daftar tujuan untuk dihapus dimuat di sini -->
+                    <p class="text-gray-500">Memuat daftar tujuan...</p>
+                </div>
+            </div>
+
+            <!-- Tombol Kembali -->
+            <button id="backToFormButton"
+                    class="w-full bg-gray-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg
+                           hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-300">
+                Kembali ke Form Utama
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Alert (Message Box) -->
+    <div id="messageBox" class="fixed top-5 right-5 p-4 rounded-lg shadow-lg text-white max-w-sm" style="display: none; z-index: 1000;">
+        <span id="messageText"></span>
+    </div>
+
+    <script>
+        // --- KONFIGURASI ---
+        // Ganti dengan URL Aplikasi Web Anda yang sudah di-deploy (dari Langkah 8)
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyjrjHdEgD3ra_mmMSH5SEy_oB7CT4fYbiXyXKEbo1t1zHdFPwPYsujS1gi5669DIqN/exec';
+        
+        // Ganti dengan URL Google Spreadsheet Anda (untuk tombol Admin)
+        const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1Ij6x8dytR22osSzvUZaQfKvDzkb5TKf8SgsqaSHe83E/edit';
+        
+        // Password Admin
+        const ADMIN_PASSWORD = 'admin123';
+        // ---------------------
+
+
+        // Variabel global
+        const mainForm = document.getElementById('mainForm');
+        const submitButton = document.getElementById('submitButton');
+        const submitText = document.getElementById('submitText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        
+        const adminLink = document.getElementById('adminLink');
+        const adminPanel = document.getElementById('adminPanel');
+        const mainCard = document.querySelector('.w-full.max-w-lg.bg-white\\/80');
+        const adminLoginForm = document.getElementById('adminLoginForm');
+        const adminContent = document.getElementById('adminContent');
+        const backToFormButton = document.getElementById('backToFormButton');
+        const adminError = document.getElementById('adminError');
+        
+        const addDestinationForm = document.getElementById('addDestinationForm');
+        const newDestinationInput = document.getElementById('newDestination');
+        const newDestWaLinkInput = document.getElementById('newDestWaLink');
+        const addDestButton = document.getElementById('addDestButton');
+        const destinationListDiv = document.getElementById('destinationList');
+        const spreadsheetLink = document.getElementById('spreadsheetLink');
+        
+        // DIUBAH: Ganti 'jenisLayananSelect' menjadi 'jenisLayananRadios'
+        const jenisLayananRadios = document.querySelectorAll('input[name="jenis_layanan"]');
+        const labelTanggal = document.getElementById('label_tanggal');
+        const labelJam = document.getElementById('label_jam');
+        const labelTujuan = document.getElementById('label_tujuan');
+        
+        const namaSantriInput = document.getElementById('nama_santri');
+        const santriDatalist = document.getElementById('santri-list');
+        const kelasInput = document.getElementById('kelas');
+        const noTlpInput = document.getElementById('no_tlp_walsan');
+
+        const tiketInput = document.getElementById('tiket');
+        const fileError = document.getElementById('fileError');
+        
+        // Simpan data santri dan tujuan di global scope
+        let allSantriData = [];
+        let allDestinationsData = [];
+        
+        // --- FUNGSI UTAMA ---
+
+        // Fungsi untuk menampilkan pesan (alert kustom)
+        function showMessage(message, isError = false) {
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+            
+            if (isError) {
+                messageBox.classList.remove('bg-green-500');
+                messageBox.classList.add('bg-red-500');
+            } else {
+                messageBox.classList.remove('bg-red-500');
+                messageBox.classList.add('bg-green-500');
+            }
+
+            // Sembunyikan pesan setelah 3 detik
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 3000);
+        }
+
+        // Fungsi untuk menangani loading state tombol
+        function setLoading(isLoading) {
+            if (isLoading) {
+                submitText.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                loadingSpinner.className = loadingSpinner.getAttribute('class_normal'); // Terapkan kelas normal
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+            } else {
+                submitText.style.display = 'block';
+                loadingSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        }
+        
+        // Fungsi untuk menangani loading state tombol admin
+        function setAdminLoading(button, isLoading) {
+             if (isLoading) {
+                button.disabled = true;
+                button.classList.add('opacity-70');
+                button.innerHTML = '<div class="spinner border-2 border-white/20 rounded-full mx-auto"></div>';
+            } else {
+                button.disabled = false;
+                button.classList.remove('opacity-70');
+                button.innerHTML = 'Tambah'; // atau teks aslinya
+            }
+        }
+
+        // --- PENGISIAN FORM (LOGIC) ---
+
+        // 1. Validasi file upload
+        tiketInput.addEventListener('change', () => {
+            const file = tiketInput.files[0];
+            if (!file) return;
+
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                fileError.textContent = 'Ukuran file terlalu besar (Max 5MB).';
+                fileError.style.display = 'block';
+                tiketInput.value = ''; // Hapus file
+            } else {
+                fileError.style.display = 'none';
+            }
+        });
+
+        // 2. Ubah label form berdasarkan Jenis Layanan (DIUBAH)
+        jenisLayananRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const jenis = e.target.value;
+                if (jenis === 'Pengantaran') {
+                    labelTanggal.textContent = 'Tanggal Keberangkatan';
+                    labelJam.textContent = 'Jam Keberangkatan (sesuai tiket)';
+                    labelTujuan.textContent = 'Tujuan (Bandara/Stasiun/dll)';
+                } else { // Penjemputan
+                    labelTanggal.textContent = 'Tanggal Kedatangan';
+                    labelJam.textContent = 'Jam Kedatangan (sesuai tiket)';
+                    labelTujuan.textContent = 'Lokasi Jemput (Bandara/Stasiun/dll)';
+                }
+            });
+        });
+
+        // 3. Muat data Tujuan dari Google Spreadsheet
+        async function loadDestinations() {
+            try {
+                const response = await fetch(`${GAS_WEB_APP_URL}?action=getDestinations`);
+                if (!response.ok) throw new Error('Gagal mengambil data tujuan.');
+                
+                const data = await response.json();
+                allDestinationsData = data.destinations; // Simpan data global
+                
+                const select = document.getElementById('tujuan');
+                select.innerHTML = '<option value="" disabled selected>Pilih Tujuan</option>'; // Reset
+                
+                allDestinationsData.forEach(dest => {
+                    const option = document.createElement('option');
+                    option.value = dest.name; // Hanya 'name' yang jadi value
+                    option.textContent = dest.name;
+                    select.appendChild(option);
+                });
+                
+                // Perbarui juga panel admin
+                updateAdminDestinationList();
+
+            } catch (error) {
+                console.error('Error loading destinations:', error);
+                showMessage('Gagal memuat daftar tujuan. Coba refresh.', true);
+                document.getElementById('tujuan').innerHTML = '<option value="" disabled selected>Error memuat data</option>';
+            }
+        }
+        
+        // 4. Muat data Santri dari Google Spreadsheet
+        async function loadSantriList() {
+            try {
+                const response = await fetch(`${GAS_WEB_APP_URL}?action=getSantriList`);
+                if (!response.ok) throw new Error('Gagal mengambil data santri.');
+
+                const data = await response.json();
+                allSantriData = data.santri; // Simpan data global
+                
+                santriDatalist.innerHTML = ''; // Kosongkan datalist
+
+                allSantriData.forEach(santri => {
+                    const option = document.createElement('option');
+                    option.value = santri.nama;
+                    santriDatalist.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error('Error loading santri list:', error);
+                showMessage('Gagal memuat daftar santri.', true);
+            }
+        }
+        
+        // 5. Isi otomatis Kelas & No Tlp saat Nama Santri dipilih/diketik
+        namaSantriInput.addEventListener('input', autoFillSantriData);
+
+        function autoFillSantriData() {
+            const selectedName = namaSantriInput.value;
+            const santri = allSantriData.find(s => s.nama.toLowerCase() === selectedName.toLowerCase());
+
+            if (santri) {
+                // Santri ditemukan di database
+                kelasInput.value = santri.kelas || '';
+                noTlpInput.value = santri.no_tlp || '';
+                
+                // Kunci field
+                kelasInput.setAttribute('readonly', true);
+                noTlpInput.setAttribute('readonly', true);
+                kelasInput.classList.add('bg-gray-100');
+                noTlpInput.classList.add('bg-gray-100');
+            } else {
+                // Santri tidak ditemukan (mungkin santri baru)
+                // Buka field agar bisa diisi manual
+                kelasInput.value = kelasInput.value || ''; // Jangan hapus jika user sudah ketik
+                noTlpInput.value = noTlpInput.value || '';
+                
+                kelasInput.removeAttribute('readonly');
+                noTlpInput.removeAttribute('readonly');
+                kelasInput.classList.remove('bg-gray-100');
+                noTlpInput.classList.remove('bg-gray-100');
+                kelasInput.placeholder = 'Isi kelas manual...';
+                noTlpInput.placeholder = 'Isi No. Tlp manual...';
+            }
+        }
+
+        // --- SUBMIT FORM UTAMA ---
+        
+        mainForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoading(true);
+
+            const file = tiketInput.files[0];
+            if (!file) {
+                showMessage('Silakan upload file tiket.', true);
+                setLoading(false);
+                return;
+            }
+
+            // Validasi file lagi (jaga-jaga)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                showMessage('Ukuran file terlalu besar (Max 5MB).', true);
+                setLoading(false);
+                return;
+            }
+
+            // Ubah file ke base64
+            let fileData, fileType, fileName;
+            try {
+                const reader = new FileReader();
+                const fileReadPromise = new Promise((resolve, reject) => {
+                    reader.onerror = () => {
+                        reader.abort();
+                        reject(new DOMException("Problem parsing input file."));
+                    };
+                    reader.onload = () => {
+                        // Hasilnya: data:image/png;base64,iVBORw0KGgo...
+                        const base64String = reader.result.split(',')[1];
+                        resolve(base64String);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                
+                fileData = await fileReadPromise;
+                fileType = file.type;
+                fileName = file.name;
+
+            } catch (error) {
+                console.error('Error reading file:', error);
+                showMessage('Gagal membaca file. Coba lagi.', true);
+                setLoading(false);
+                return;
+            }
+
+            // Kumpulkan data form
+            const formData = {
+                // DIUBAH: Cara mengambil value dari radio button
+                jenis_layanan: document.querySelector('input[name="jenis_layanan"]:checked').value,
+                nama_santri: namaSantriInput.value,
+                kelas: kelasInput.value,
+                no_tlp_walsan: noTlpInput.value, // Data baru
+                tanggal: document.getElementById('tanggal').value,
+                jam: document.getElementById('jam').value,
+                tujuan: document.getElementById('tujuan').value,
+                keterangan: document.getElementById('keterangan').value,
+                fileData: fileData,
+                fileType: fileType,
+                fileName: fileName
+            };
+
+            // Kirim data ke Google Apps Script
+            try {
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(formData),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                        if (result.status === 'success') {
+                    // Cek apakah ada link WA
+                    if (result.wa_link && result.wa_link.startsWith('http')) {
+                        // Ada link WA, arahkan pengguna
+                        showMessage('Data berhasil dikirim! Mengarahkan ke Grup WA...');
+                        setTimeout(() => {
+                            window.location.href = result.wa_link;
+                            // Reset form setelah redirect (jika pengguna kembali)
+                            mainForm.reset();
+                            setLoading(false);
+                            // Reset field yg readonly
+                            autoFillSantriData(); 
+                        }, 2000); // Tunggu 2 detik
+                    } else {
+                        // Tidak ada link WA, tampilkan pesan sukses biasa
+                        showMessage('Data berhasil dikirim!');
+                        mainForm.reset();
+                        setLoading(false);
+                        autoFillSantriData();
+                    }
+                } else {
+                    throw new Error(result.message || 'Terjadi kesalahan saat mengirim data.');
+                }
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showMessage('Gagal mengirim data: ' + error.message, true);
+                setLoading(false);
+            }
+        });
+
+
+        // --- LOGIKA PANEL ADMIN ---
+
+        // Tampilkan/Sembunyikan Panel Admin
+        adminLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            mainCard.style.display = 'none';
+            adminPanel.style.display = 'block';
+            adminError.style.display = 'none';
+        });
+
+        backToFormButton.addEventListener('click', () => {
+            mainCard.style.display = 'block';
+            adminPanel.style.display = 'none';
+        });
+
+        // Login Admin
+        adminLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            if (password === ADMIN_PASSWORD) {
+                adminLoginForm.style.display = 'none';
+                adminContent.style.display = 'block';
+                spreadsheetLink.href = SPREADSHEET_URL; // Set link spreadsheet
+                loadDestinations(); // Muat ulang daftar tujuan untuk admin
+            } else {
+                adminError.style.display = 'block';
+            }
+        });
+
+        // Perbarui daftar tujuan di panel admin
+        function updateAdminDestinationList() {
+            destinationListDiv.innerHTML = ''; // Kosongkan
+            
+            if (allDestinationsData.length === 0) {
+                 destinationListDiv.innerHTML = '<p class="text-gray-500">Belum ada tujuan.</p>';
+                 return;
+            }
+
+            allDestinationsData.forEach(dest => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center bg-gray-100 p-2 rounded-lg';
+                
+                const span = document.createElement('span');
+                span.textContent = dest.name;
+                span.className = 'text-gray-800';
+                
+                const button = document.createElement('button');
+                button.textContent = 'Hapus';
+                button.className = 'text-red-500 hover:text-red-700 text-sm font-medium';
+                button.onclick = () => removeDestination(dest.name);
+                
+                div.appendChild(span);
+                div.appendChild(button);
+                destinationListDiv.appendChild(div);
+            });
+        }
+
+        // Admin: Tambah Tujuan
+        addDestinationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = newDestinationInput.value.trim();
+            const newWaLink = newDestWaLinkInput.value.trim();
+            if (!newName) return;
+
+            setAdminLoading(addDestButton, true);
+
+            try {
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'addDestination',
+                        destination: newName,
+                        wa_link: newWaLink // Kirim link WA
+                    }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showMessage('Tujuan berhasil ditambahkan.');
+                    newDestinationInput.value = '';
+                    newDestWaLinkInput.value = '';
+                    loadDestinations(); // Muat ulang daftar
+                } else {
+                    throw new Error(result.message);
+                }
+
+            } catch (error) {
+                console.error('Error adding destination:', error);
+                showMessage('Gagal menambah tujuan: ' + error.message, true);
+            } finally {
+                setAdminLoading(addDestButton, false);
+                addDestButton.innerHTML = 'Tambah'; // Kembalikan teks tombol
+            }
+        });
+
+        // Admin: Hapus Tujuan
+        async function removeDestination(destinationName) {
+            // Konfirmasi (non-blocking)
+            if (!confirm(`Yakin ingin menghapus tujuan "${destinationName}"?`)) {
+                return;
+            }
+            
+            try {
+                 const response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'removeDestination',
+                        destination: destinationName
+                    }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showMessage('Tujuan berhasil dihapus.');
+                    loadDestinations(); // Muat ulang daftar
+                } else {
+                    throw new Error(result.message);
+                }
+
+            } catch (error) {
+                console.error('Error removing destination:', error);
+                showMessage('Gagal menghapus tujuan: ' + error.message, true);
+            }
+        }
+
+
+        // --- INISIALISASI ---
+        // Muat data saat halaman dibuka
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDestinations();
+            loadSantriList();
+        });
+
+    </script>
+</body>
+</html>
+
+
